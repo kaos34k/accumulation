@@ -20,7 +20,7 @@ jobs:
       - name: Build and Test
         run: |
           go version
-          ./sam build
+          sam build
           go test ./... -v
       - name: build function
         run: |
