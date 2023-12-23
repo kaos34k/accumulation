@@ -24,10 +24,10 @@ jobs:
           export CGO_ENABLED=0
           export SAM_CLI_TELEMETRY=0
           go version
-          sam build
+          go mod download
           go test ./... -v
-      - name: build function
-        run: |
           sam validate
           sam build
+      - name: build function
+        run: |
           sam deploy --resolve-s3 --no-confirm-changeset --no-fail-on-empty-changeset
