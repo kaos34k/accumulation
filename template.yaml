@@ -26,3 +26,9 @@ Resources:
           Properties:
             Path: /accumulation
             Method: POST
+      Policies:
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action: dynamodb:PutItem
+              Resource: arn:aws:dynamodb:us-west-1:763564070137:table/Point
