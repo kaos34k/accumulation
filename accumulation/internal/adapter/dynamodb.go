@@ -5,18 +5,29 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 type DynamoDBRepository struct {
-	dynamoDBClient *dynamodb.DynamoDB
-	tableName      string
+	DynamoDBClient DynamoDBAPI
+	TableName      string
+}
+
+type DynamoDBAPI interface {
+	GetItem(*dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error)
+	PutItem(*dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
+}
+
+func NewDynamoDBRepository(tableName string, client DynamoDBAPI) *DynamoDBRepository {
+	return &DynamoDBRepository{
+		DynamoDBClient: client,
+		TableName:      tableName,
+	}
 }
 
 func (r *DynamoDBRepository) GetPointByID(id string) (*domain.Point, error) {
 	input := &dynamodb.GetItemInput{
-		TableName: aws.String(r.tableName),
+		TableName: aws.String(r.TableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
 				S: aws.String(id),
@@ -24,7 +35,7 @@ func (r *DynamoDBRepository) GetPointByID(id string) (*domain.Point, error) {
 		},
 	}
 
-	result, err := r.dynamoDBClient.GetItem(input)
+	result, err := r.DynamoDBClient.GetItem(input)
 	if err != nil {
 		return nil, err
 	}
@@ -37,19 +48,11 @@ func (r *DynamoDBRepository) GetPointByID(id string) (*domain.Point, error) {
 	return point, nil
 }
 
-func NewDynamoDBRepository(tableName string) *DynamoDBRepository {
-	sess := session.Must(session.NewSession())
-	return &DynamoDBRepository{
-		dynamoDBClient: dynamodb.New(sess),
-		tableName:      tableName,
-	}
-}
-
 func (r *DynamoDBRepository) CreatePoint(point *domain.Point) error {
 	totalAsString := fmt.Sprintf("%.2f", point.Total)
 
 	input := &dynamodb.PutItemInput{
-		TableName: aws.String(r.tableName),
+		TableName: aws.String(r.TableName),
 		Item: map[string]*dynamodb.AttributeValue{
 			"id": {
 				S: aws.String(point.ID),
@@ -66,6 +69,6 @@ func (r *DynamoDBRepository) CreatePoint(point *domain.Point) error {
 		},
 	}
 
-	_, err := r.dynamoDBClient.PutItem(input)
+	_, err := r.DynamoDBClient.PutItem(input)
 	return err
 }

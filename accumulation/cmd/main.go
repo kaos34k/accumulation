@@ -11,6 +11,8 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 type LambdaHandler struct {
@@ -45,13 +47,15 @@ func (h *LambdaHandler) HandleRequest(ctx context.Context, request events.APIGat
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       fmt.Sprintf("point: success create"),
+		Body:       fmt.Sprint("point: success create"),
 	}, nil
 }
 
 func main() {
 	tableName := "Point"
-	pointRepository := adapter.NewDynamoDBRepository(tableName)
+	sess := session.Must(session.NewSession())
+	actualDynamoDBClient := dynamodb.New(sess)
+	pointRepository := adapter.NewDynamoDBRepository(tableName, actualDynamoDBClient)
 	handler := NewLambdaHandler(pointRepository)
 	lambda.Start(handler.HandleRequest)
 }

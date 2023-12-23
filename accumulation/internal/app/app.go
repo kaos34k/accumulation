@@ -15,6 +15,8 @@ func NewMyApp(pointUsecase usecase.PointUsecase) *MyApp {
 	}
 }
 
+
+
 func (a *MyApp) HandleRequest(req *domain.Point) error {
 	err := a.pointUsecase.CreatePoint(req)
 	if err != nil {
