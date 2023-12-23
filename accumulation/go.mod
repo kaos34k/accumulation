@@ -9,4 +9,4 @@ replace gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.2.8
 
 module accumulation
 
-go 1.18
+go 1.16
