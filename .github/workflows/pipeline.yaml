@@ -19,15 +19,15 @@ jobs:
           aws-region: us-west-1
       - name: Build and Test
         run: |
+          export GOOS=linux
+          export GOARCH=amd64
+          export CGO_ENABLED=0
+          export SAM_CLI_TELEMETRY=0
           go version
           sam build
           go test ./... -v
       - name: build function
         run: |
-          export GOOS=linux
-          export GOARCH=amd64
-          export CGO_ENABLED=0
-          export SAM_CLI_TELEMETRY=0
           sam validate
           sam build
           sam deploy --resolve-s3 --no-confirm-changeset --no-fail-on-empty-changeset
