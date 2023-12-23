@@ -19,9 +19,8 @@ jobs:
           aws-region: us-west-1
       - name: Build and Test
         run: |
-          export GO111MODULE=on
           go version
-          go mod download
+          ./sam build
           go test ./... -v
       - name: build function
         run: |
